@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
 
+/*===========Ciało============*/
 body {
   margin-top: 0px;
   font-family: Lato;
@@ -17,6 +18,7 @@ body {
   flex-direction: column;
 }
 
+/*===========Rodzaje czcionek============*/
 h1 {
   font-size: 50px;
 }
@@ -33,12 +35,14 @@ p {
   font-size: 20px;
 }
 
+/*===========Głowa============*/
 .mainHeader {
   text-align: center;
   padding: 1px;
   background-color: #004466;
 }
 
+/*===========Nawigacja============*/
 .mainNav {
   display: flex;
   justify-content: space-between;
@@ -67,13 +71,13 @@ p {
   background-color: #006623;
 }
 
+/*===========Główny tekst============*/
 #mainTextBox {
   padding: 150px;
   padding-top: 40px;
   align-self: center;
   max-width: 800px; /*żeby obrazek nie rozjeżdżał się przy oddalaniu*/
 }
-
 .languageSpan {
   background-color: #005052;
   display: inline-block; /*żeby przy nowym wierszu spany nie nachodziły na siebie*/
@@ -83,6 +87,7 @@ p {
   margin: 3px;
 }
 
+/*===========Stopka============*/
 footer {
   text-align: center;
   background-color: #004466;
@@ -92,11 +97,13 @@ footer {
   font-size: 14px;
 }
 
+/*===========Obrazki i galeria============*/
 .imageBox {
   margin: 10px;
   padding: 14px;
   background-color: #004466;
   border-radius: 10px;
+  text-align: center;
 }
 
 #mainGalleryBox {
@@ -104,4 +111,36 @@ footer {
   padding-top: 40px;
   display: flex;
   flex-wrap: wrap;
+}
+
+/*===========Formularz kontaktu============*/
+.contactForm {
+  width: 500px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.formLabel {
+  font-size: 16px;
+  margin: 12px;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+#mesageBox {
+  min-height: 150px;
+  resize: vertical;
+}
+
+input,
+textarea {
+  width: 100%;
+}
+
+#submitButton {
+  align-self: flex-end;
+  margin-top: 10px;
 }

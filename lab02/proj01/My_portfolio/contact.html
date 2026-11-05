@@ -29,9 +29,44 @@
       </a>
     </nav>
 
-    <main id="mainTextBox"></main>
+    <main id="mainTextBox">
+      <section style="width: auto" class="imageBox">
+        <h3>Formularz kontaktowy</h3>
+        <form action="" , class="contactForm">
+          <label for="email" class="formLabel">Adres email nadawcy</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            autocomplete="email"
+            required
+          />
+          <br />
+
+          <label for="messageType" class="formLabel">Temat wiadomości</label>
+          <select name="messageType" id="messageType">
+            <option value="cowork">Współpraca</option>
+            <option value="projectQuery">Zapytanie do projektu</option>
+            <option value="other">Inne</option>
+          </select>
+          <br />
+
+          <label for="mesageBox" class="formLabel">Wiadomość</label>
+          <br />
+          <textarea name="mesageBox" id="mesageBox" required>
+Szanowny Panie,
+
+...
+
+Z poważaniem, ... </textarea
+          >
+
+          <button type="submit" id="submitButton">Prześlij</button>
+        </form>
+      </section>
+    </main>
     <footer>
-      <p class="pSmall">Data ostatniej modyfikacji:</p>
+      <p class="pSmall">Data ostatniej modyfikacji: 5.11.2026</p>
       <p class="pSmall">Jan Stąpór</p>
     </footer>
   </body>
