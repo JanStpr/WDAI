@@ -40,6 +40,17 @@ p {
   text-align: center;
   padding: 1px;
   background-color: #004466;
+  position: relative; /*Żeby wybór języka się w nim ustawiał*/
+}
+
+#languageSelection {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.languageFormFlag {
+  font-size: 20px;
 }
 
 /*===========Nawigacja============*/

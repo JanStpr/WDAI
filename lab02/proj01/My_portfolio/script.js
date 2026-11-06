@@ -24,5 +24,14 @@ async function makeTranslation(language) {
 
 //trigger dokonujący automatycznego tłumaczenia podstrony przy wczytywaniu
 window.addEventListener("DOMContentLoaded", () => {
-  makeTranslation(localStorage.getItem("selectedLanguage") || "pl_pl"); //tłumaczneie na zapisany język, bądź język domyślny (Polski), jeśli nie wybrano języka.
+  makeTranslation(localStorage.getItem("selectedLanguage") || "pl_pl"); //tłumaczneie na zapisany język, bądź język domyślny (Polski), jeśli nie wybrano języka. (|| w JS działa tak że wybierana jest pierwsza prawdzia/nie nullowa wartość)
 });
+
+//trigger do przycisku zmiany języka
+document
+  .getElementById("languageSelection")
+  .addEventListener("change", function (event) {
+    var chosenLanguage = event.target.value;
+    localStorage.setItem("selectedLanguage", chosenLanguage);
+    makeTranslation(chosenLanguage);
+  });

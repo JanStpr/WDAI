@@ -1,3 +1,42 @@
 {
-	"DOKOŃCZYĆ": ""
+  "siteTitle": "Jan Stąpór's portfolio",
+  "headerTitle": "Jan Stąpór's portfolio",
+  "navHome": "Home",
+  "navGallery": "Gallery",
+  "navContact": "Contact",
+
+  "footer_p_1": "Last modification: November 6'th 2026",
+
+  "index_main_h3_1": "About me",
+  "index_main_img1": "The D17 Building, where my faculty is located and where the most of my classes take place.",
+  "index_main_p1": "I am a second year student at the AGH University of Kraków in the field of Computer Science of the Faculty of Computer Science.",
+  "index_main_h3_2": "Skills",
+  "index_main_p_2": "I know the following programming languages:",
+  "index_main_h4_1": "Intermediate level",
+  "index_main_h4_2": "Basic level",
+  "index_main_h4_3": "In process of learning",
+
+  "d17_alt": "A picture of the AGH Computer Science faculty (D17)",
+  "Pi_lab14_alt": "A picture of C language code",
+  "ASD_exam3_alt": "A picture of Python language code",
+  "czolg0105_alt": "A picture of a tank displayed in Blender program.",
+  "touristmap_exporter_alt": "A picture of Python language code using Tkinter library",
+  "WDI_isprime_alt": "A picture of an isPrime function written in Python",
+
+  "d17_desc": "The D17 Building, where my faculty is located.",
+  "Pi_lab14_desc": "Fragment od the code from the last classed of the Imperative Programming subject.",
+  "ASD_exam3_desc": "Fragment od the code from the third (retaking) exam from Algorithm and Data Structures subject.",
+  "czolg0105_desc": "One of the frames from a video makde using the model I have created on the Programming subject in the third grade of Highshool.",
+  "touristmap_exporter_desc": "Fragment od the code from my map exporter (from mapaturystyczna.pl site) project. I have learned to use the Tkinter library back then.",
+  "WDI_isprime_desc": "Code of a function that checks whether a number is prime, made on the classes of the Introduction to Computer Science subject.",
+  "Film_desc": "Video with a model that i was making in on Programming classes in the third grade of Highshool.",
+
+  "contact_contactForms": "Contact form",
+  "contact_senderEmail": "Sender email address",
+  "contact_messageType": "Message topic",
+  "contact_messageType_cowork": "Collaboration",
+  "contact_messageType_projectQuery": "Enquiry to a project",
+  "contact_messageType_other": "Other",
+  "contact_messageLabel": "Message",
+  "contact_submit": "Send"
 }
