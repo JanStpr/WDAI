@@ -2,7 +2,7 @@
 
 /*===========Ciało============*/
 body {
-  margin-top: 0px;
+  margin: 0px;
   font-family: Lato;
 
   width: 100%;
@@ -10,11 +10,12 @@ body {
   margin-left: auto;
   margin-right: auto;
 
+  min-height: 100dvh; /*Żeby  wysokość dopadowywała się dynamicznie do wysokości ekranu*/
+
   background-color: #006466;
   color: white;
 
   display: flex;
-  justify-content: center;
   flex-direction: column;
 }
 
@@ -118,6 +119,7 @@ p {
 footer {
   text-align: center;
   background-color: #004466;
+  margin-top: auto; /*Sprawia że stopka na każdym ekranie jest na dole*/
 }
 
 .pSmall {
