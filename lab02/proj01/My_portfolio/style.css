@@ -18,6 +18,19 @@ body {
   flex-direction: column;
 }
 
+/*Ukrywa domyślne wartości w body, póki JS nie zrobi tłumaczenia, z wyłączeniem obrazków*/
+html [data-textToTranslate]:not(img) {
+  /*ogólny selektor, więc ma mniejszy prioryten niż poniższy selektor szczególny*/
+  opacity: 0;
+}
+
+/*Ukrywa domyślne wartości w body, póki JS nie zrobi tłumaczenia*/
+html[isTranslationFinished="true"] [data-textToTranslate]:not(img) {
+  /*selektor działa dla elementów z atrybutem data_textoToTranslate (nie będących img) które są dziećmi takiego htmla, który ma ustawione isTranslationFinished na true*/
+  transition: opacity 0.2s ease-in;
+  opacity: 1;
+}
+
 /*===========Rodzaje czcionek============*/
 h1 {
   font-size: 50px;
@@ -47,6 +60,8 @@ p {
   position: absolute;
   top: 0;
   right: 0;
+  background-color: transparent;
+  border-color: transparent;
 }
 
 .languageFormFlag {

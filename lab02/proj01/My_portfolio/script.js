@@ -20,6 +20,9 @@ async function makeTranslation(language) {
       }
     }
   });
+
+  //html ma już gotowe tłumaczenie
+  document.documentElement.setAttribute("isTranslationFinished", "true");
 }
 
 //język jest rzyemany w localstorage, żeby użytkownik nie musiał za każdym wejściem na stronę zmieniać języka.
