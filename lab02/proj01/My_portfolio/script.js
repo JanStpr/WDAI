@@ -1,4 +1,4 @@
-//Funkcja dokonująca tłumaczenia podstrny na wskazany język
+//Funkcja dokonująca tłumaczenia podstrony na wskazany język
 async function makeTranslation(language) {
   //async - informacja dla kompilatora o tym, że funckja działa asynchronicznie
   //Próba wyczytania pliku z tłumaczeniem
@@ -22,9 +22,26 @@ async function makeTranslation(language) {
   });
 }
 
+//język jest rzyemany w localstorage, żeby użytkownik nie musiał za każdym wejściem na stronę zmieniać języka.
+
 //trigger dokonujący automatycznego tłumaczenia podstrony przy wczytywaniu
 window.addEventListener("DOMContentLoaded", () => {
-  makeTranslation(localStorage.getItem("selectedLanguage") || "pl_pl"); //tłumaczneie na zapisany język, bądź język domyślny (Polski), jeśli nie wybrano języka. (|| w JS działa tak że wybierana jest pierwsza prawdzia/nie nullowa wartość)
+  var chosenLanguage = localStorage.getItem("selectedLanguage");
+
+  //ustawia język domyślny, jeśli użytkownik nie ma w pamięci zapisanego języka
+  if (chosenLanguage === null) {
+    chosenLanguage = "pl_pl";
+    localStorage.setItem("selectedLanguage", chosenLanguage);
+  }
+
+  makeTranslation(chosenLanguage); //tłumaczneie na zapisany język
+
+  var selectedElement = document.getElementById("languageSelection");
+
+  if (selectedElement) {
+    //bezpieczna zmiana tylko, jeśli znaleziono selected Element
+    selectedElement.value = chosenLanguage;
+  }
 });
 
 //trigger do przycisku zmiany języka
