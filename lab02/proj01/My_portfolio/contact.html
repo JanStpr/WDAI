@@ -3,37 +3,44 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Portfolio Jana Stąpóra</title>
+    <title data-textToTranslate="siteTitle">siteTitle</title>
 
-    <link rel="icon" href="resources/icon.ico" />
+    <link rel="icon" href="resources/images/icon.ico" />
     <link rel="stylesheet" href="./style.css" />
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
   </head>
 
   <body>
     <header class="mainHeader">
-      <h1>Portfolio Jana Stąpóra</h1>
+      <h1 data-textToTranslate="headerTitle">headerTitle</h1>
     </header>
 
     <nav class="mainNav">
       <a class="navButton" href="index.html">
-        <h2>Główna</h2>
+        <h2 data-textToTranslate="navHome">navHome</h2>
       </a>
 
       <a class="navButton" href="gallery.html">
-        <h2>Galeria</h2>
+        <h2 data-textToTranslate="navGallery">navGallery</h2>
       </a>
 
       <a class="navButton" href="contact.html" id="currSubSite">
-        <h2>Kontakt</h2>
+        <h2 data-textToTranslate="navContact">navContact</h2>
       </a>
     </nav>
 
     <main id="mainTextBox">
       <section style="width: auto" class="imageBox">
-        <h3>Formularz kontaktowy</h3>
+        <h3 data-textToTranslate="contact_contactForms">
+          contact_contactForms
+        </h3>
         <form action="" , class="contactForm">
-          <label for="email" class="formLabel">Adres email nadawcy</label>
+          <label
+            for="email"
+            class="formLabel"
+            data-textToTranslate="contact_senderEmail"
+            >contact_senderEmail</label
+          >
           <input
             type="email"
             name="email"
@@ -43,30 +50,55 @@
           />
           <br />
 
-          <label for="messageType" class="formLabel">Temat wiadomości</label>
+          <label
+            for="messageType"
+            class="formLabel"
+            data-textToTranslate="contact_messageType"
+            >contact_messageType</label
+          >
           <select name="messageType" id="messageType">
-            <option value="cowork">Współpraca</option>
-            <option value="projectQuery">Zapytanie do projektu</option>
-            <option value="other">Inne</option>
+            <option
+              value="cowork"
+              data-textToTranslate="contact_messageType_cowork"
+            >
+              contact_messageType_cowork
+            </option>
+            <option
+              value="projectQuery"
+              data-textToTranslate="contact_messageType_projectQuery"
+            >
+              contact_messageType_projectQuery
+            </option>
+            <option
+              value="other"
+              data-textToTranslate="contact_messageType_other"
+            >
+              contact_messageType_other
+            </option>
           </select>
           <br />
 
-          <label for="mesageBox" class="formLabel">Wiadomość</label>
-          <br />
-          <textarea name="mesageBox" id="mesageBox" required>
-Szanowny Panie,
-
-...
-
-Z poważaniem, ... </textarea
+          <label
+            for="mesageBox"
+            class="formLabel"
+            data-textToTranslate="contact_messageLabel"
+            >contact_messageLabel</label
           >
+          <br />
+          <textarea name="mesageBox" id="mesageBox" required></textarea>
 
-          <button type="submit" id="submitButton">Prześlij</button>
+          <button
+            type="submit"
+            id="submitButton"
+            data-textToTranslate="contact_submit"
+          >
+            contact_submit
+          </button>
         </form>
       </section>
     </main>
     <footer>
-      <p class="pSmall">Data ostatniej modyfikacji: 5.11.2026</p>
+      <p class="pSmall" data-textToTranslate="footer_p_1">footer_p_1</p>
       <p class="pSmall">Jan Stąpór</p>
     </footer>
   </body>

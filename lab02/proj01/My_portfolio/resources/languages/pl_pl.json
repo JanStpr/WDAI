@@ -1,0 +1,44 @@
+{
+	"siteTitle": "Portfolio Jana Stąpóra",
+	"headerTitle": "Portfolio Jana Stąpóra",
+	"navHome": "Główna",
+	"navGallery": "Galeria",
+	"navContact": "Kontakt",
+	
+	"footer_p_1": "Data ostatniej modyfikacji: 6 październik 2026",
+	
+	
+	
+	"index_main_h3_1": "O mnie",
+	"index_main_img1": "Budynek D17, w którym znajduje się mój wydział i gdzie mam większość zajęć.",
+	"index_main_p1": "Jestem studentem II roku na Akademii Górniczo Hutniczej, na kierunku informatyka Wydziału Informatyki.",
+	"index_main_h3_2": "Umiejętności",
+	"index_main_p_2": "Znam następujące języki programowania:",
+	"index_main_h4_1": "Poziom średniozaawansowany",
+	"index_main_h4_2": "Poziom podstawowy",
+	"index_main_h4_3": "W trakcie nauki",
+	
+	"d17_alt": "Zdjęcie budynku WI agh (D17)",
+	"Pi_lab14_alt": "Zdjęcie kodu z języka C",
+	"ASD_exam3_alt": "Zdjęcie kodu z języka python",
+	"czolg0105_alt": "Zdjęcie przedstawiające czołg wyświetlany w programie blender",
+	"touristmap_exporter_alt": "Zdjęcie kodu z języka Python",
+	"WDI_isprime_alt": "Zdjęcie kodu z języka python",
+	
+	"d17_desc": "Budynek D17, w którym znajduje się mój wydział.",
+	"Pi_lab14_desc": "Fragment kodu z ostatnich ćwiczeń z przedmiotu PI.",
+	"ASD_exam3_desc": "Fragment kodu z trzeciego (poprawkowego) egzaminu z przedmiotu ASD.",
+	"czolg0105_desc": "Jedna z klatek filmiku z użyciem modelu który tworzyłem na przedmiocie programowanie w trzeciej klasie liceum.",
+	"touristmap_exporter_desc": "Fragment kodu mojego projektu eksportera map z serwisu mapaturystyczna.pl. Nauczyłem się wtedy używać biblioteki tkinter.",
+	"WDI_isprime_desc": "Kod z funkcji sprawdzającej czy liczba jest pierwsza, z ćwiczeń z przedmiotu WDI.",
+	"Film_desc": "Filmik z modelem który tworzyłem na przedmiocie programowanie w trzeciej klasie liceum.",
+	
+	"contact_contactForms": "Formularz kontaktowy",
+	"contact_senderEmail": "Adres email nadawcy",
+	"contact_messageType": "Temat wiadomości",
+	"contact_messageType_cowork": "Współpraca",
+	"contact_messageType_projectQuery": "Zapytanie do projektu",
+	"contact_messageType_other": "Inne",
+	"contact_messageLabel": "Wiadomość",
+	"contact_submit": "Prześlij"
+}
