@@ -144,7 +144,6 @@ footer {
 
 /*===========Formularz kontaktu============*/
 .contactForm {
-  width: 500px;
   text-align: center;
   display: flex;
   flex-direction: column;
