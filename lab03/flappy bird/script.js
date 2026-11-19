@@ -10,11 +10,16 @@ const gameScreenHeight = 620;
 //-----Game rules--------------------------------------
 const pipeHeightRange = 50; //maximum offset that a pipe (it's holes center) would have from the center of screen
 const pipeFrequency = 1500; //
+const pipeGap = 120;
 
 //-----Physics-----------------------------------------
-const physicsUpdateDelay = 1; //in ms
 const velocityX = -2;
-const gravitationalAcc = 0.02;
+const backgroundVelocityX = -0.7;
+
+const physicsUpdateDelay = 1; //in ms
+
+const gravitationalAcc = 0.01;
+const terminalVelocity = 1; //the velocity vecor can't get a value offsetted more thant this value from 0
 
 //=======================================================
 // GLOBAL VARIABLES AND CONSTANTS
@@ -26,90 +31,189 @@ const game = {
 };
 let context; //not in the game object for the sake of having shorter code
 
-//-----Bird--------------------------------------------
-const bird = {
-  //const, as this referecne will only reference the one and olny bird on the screen.
-  //const properties
-  width: 34,
-  height: 24,
-  x: gameScreenWidth / 8,
-  sprite: null,
-  velocityY: 0, //if velocity>0, than the bird falls
+//-----Single-(generic class)--------------------------
 
-  //variable attributes
-  y: gameScreenHeight / 2,
-};
-
-//-----Pipes--------------------------------------------
-let topPipeSprite = null; //these two have to be loaded first
-let bottomPipeSprite = null;
-
-let pipes = []; //list of pipes
-
-class Pipe {
-  //constants
-  topSprite = topPipeSprite;
-  bottomSprite = bottomPipeSprite;
-
-  width = 52;
-  singlePipeHeight = 320;
-  gapHeight = 120;
-
+//A generic class for a world element, that appears on the screen only as a single (one sprite) object.
+class Single {
+  //they are all static, as  they are shared by every
+  static sprite = null;
+  static width = gameScreenWidth;
+  static height = gameScreenHeight;
+  x;
   y;
 
-  //variables
-  x = game.screen.width;
-  passed = false; //true when bird passes the pipe
-
-  constructor(y) {
+  constructor(x, y) {
+    this.x = x;
     this.y = y;
   }
 
-  //draws the dobule pipe.
-  // y is the place right below the top pipe
-  // (y + gapHeight) is the place right above the bottom pipe
-  draw(context) {
-    //top pipe
-    context.drawImage(
-      this.topSprite,
-      this.x,
-      this.y - (gameScreenHeight + this.gapHeight) / 2,
-      this.width,
-      this.singlePipeHeight,
-    );
+  static loadImage(link) {
+    this.sprite = new Image();
+    this.sprite.src = link;
+  }
 
-    //bottom pipe
+  draw(context) {
+    //this.constructor. zapewnia, że odwołamy się do zmiennej statycznej klasy utworzonego obiektu
     context.drawImage(
-      this.bottomSprite,
+      this.constructor.sprite,
       this.x,
-      this.y + this.gapHeight / 2,
-      this.width,
-      this.singlePipeHeight,
+      this.y,
+      this.constructor.width,
+      this.constructor.height,
     );
   }
 }
+
+//A generic type for a collection of objects from a class extending Single
+class Singles {
+  static type = Single; //NEEDS TO BE OVERWRITTEN; HAS TO BE A CLASS EXTENDING SINGLE!
+  list = [];
+
+  //overrides default push. Ignores pushing a object, if the type (class) does not fit.
+  push(newElement) {
+    if (newElement instanceof this.constructor.type) this.list.push(newElement);
+    else
+      console.error(
+        "It was tried to assign an object of a class other than" +
+          this.constructor.type +
+          " to " +
+          this,
+      );
+  }
+
+  //params:
+  //    filterFunc(single) - function that filters every single in the list, before the drawing. If not needed, type:   (a) => true
+  //    forEachFunc(single) - replaces every single in the list with the result of this function called with the single as argument
+  draw(context, filterFunc, forEachFunc) {
+    this.list = this.list.filter(filterFunc);
+    for (let single of this.list) {
+      forEachFunc(single);
+      single.draw(context);
+    }
+  }
+}
+
+//-----Bird--------------------------------------------
+class Bird extends Single {
+  //override
+  static width = 34;
+  static height = 24;
+
+  //new
+  velocityY = 0;
+}
+const bird = new Bird(gameScreenWidth / 8, gameScreenHeight / 2);
+
+//-----Pipes--------------------------------------------
+
+class PipeTop extends Single {
+  //override
+  static width = 52;
+  static height = 320;
+
+  constructor(y, isFlipped) {
+    super(game.screen.width, y);
+    if (isFlipped != undefined) this.isFlipped = isFlipped;
+    else this.isFlipped = false;
+  }
+
+  draw(context) {
+    if (this.isFlipped) {
+      context.save(); //zapisujemy ustawienia kontekstu (do przywrócenia)
+      context.translate(
+        //zmienia punkt odniesienia
+        this.x + this.constructor.width / 2,
+        this.y + this.constructor.height / 2,
+      );
+      context.scale(1, -1); //odwracanie OX
+      context.drawImage(
+        this.constructor.sprite,
+        -this.constructor.width / 2,
+        -this.constructor.height / 2,
+        this.constructor.width,
+        this.constructor.height,
+      );
+      context.restore(); // Przywracamy normalny stan canvasu
+    } else
+      context.drawImage(
+        this.constructor.sprite,
+        this.x,
+        this.y - this.constructor.height,
+        this.constructor.width,
+        this.constructor.height,
+      );
+  }
+
+  //new
+  isFlipped; // if true, then the pipe will be bottom
+  passed = false; //true when bird passes the pipe. In double pipes, only the top one count the point.
+}
+
+class Pipes extends Singles {
+  //override
+  static type = PipeTop;
+}
+
+class DoublePipes extends Pipes {
+  //new
+  halfGap;
+
+  constructor(gap) {
+    super();
+    this.halfGap = gap / 2;
+  }
+
+  pushDoublePipe(centerPoint) {
+    //push top pipe
+    this.push(new PipeTop(centerPoint - this.halfGap, false));
+
+    //push bottom pipe
+    this.push(new PipeTop(centerPoint + this.halfGap, true));
+  }
+}
+
+let pipes = new DoublePipes(pipeGap);
 
 //-----Ground-------------------------------------------
-let groundSprite = null;
-let groundObjs = [];
-
-const groundWidth = 336;
-
-class Ground {
-  sprite = groundSprite;
-  width = groundWidth;
-  height = 112;
-  x;
-  y = gameScreenHeight - 112;
+class Ground extends Single {
+  //override
+  static width = 336;
+  static height = 112;
 
   constructor(x) {
-    this.x = x;
+    //UWAGA: w JS w klasie dziedziczącej nie można się odwołać do .this przed super()!!!
+    super(x, gameScreenHeight - Ground.height);
   }
 }
+
+class GroundList extends Singles {
+  static type = Ground;
+}
+let groundObjs = new GroundList();
+
+//-----Background---------------------------------------
+//background has to be in JS too, due to the adaptive scaling in css
+class Background extends Single {
+  //override
+  static width = 288;
+  static height = 512;
+
+  constructor(x) {
+    super(x, 0);
+  }
+}
+
+class Backgrounds extends Singles {
+  static type = Background;
+}
+
+let backGroundObjs = new Backgrounds();
 
 //=======================================================
 // FUNCTIONS
 //=======================================================
+
+//-----Initializing-------------------------------------
 
 window.onload = () => {
   //initialize game screen
@@ -118,83 +222,101 @@ window.onload = () => {
   game.screen.height = gameScreenHeight;
   context = game.screen.getContext("2d");
 
-  //load bird sprite
-  bird.sprite = new Image();
-  bird.sprite.src = "./assets/Flappy\ Bird/yellowbird-midflap.png";
-  //the image has to load
-  bird.sprite.onload = () => {
-    context.drawImage(bird.sprite, bird.x, bird.y, bird.width, bird.height);
-  };
+  //loading sprites
+  Bird.loadImage("./assets/Flappy\ Bird/yellowbird-midflap.png");
+  PipeTop.loadImage("./assets/Flappy\ Bird/pipe-green.png");
+  Ground.loadImage("./assets/Flappy\ Bird/base.png");
+  Background.loadImage("./assets/Flappy\ Bird/background-day.png");
 
-  //load top pipe sprite
-  topPipeSprite = new Image();
-  topPipeSprite.src = "./assets/Flappy\ Bird/pipe-green-top.png";
-
-  //load bottom pipe sprite
-  bottomPipeSprite = new Image();
-  bottomPipeSprite.src = "./assets/Flappy\ Bird/pipe-green-bottom.png";
-
-  //load ground sprite
-  groundSprite = new Image();
-  groundSprite.src = "./assets/Flappy\ Bird/base.png";
+  //pushing initial elements
   groundObjs.push(new Ground(0));
-  groundObjs.push(new Ground(groundWidth));
+  groundObjs.push(new Ground(Ground.width));
+  backGroundObjs.push(new Background(0));
+  backGroundObjs.push(new Background(Background.width));
 
+  //start rendering
   requestAnimationFrame(render); //renders a frame and after a calculated by processor (typically 60Hz) amount of time, runs the given function (render)
-  setInterval(placeGround, groundWidth / Math.abs(velocityX));
-  setInterval(placePipes, pipeFrequency);
-  setInterval(birdPhisicsUpdate, physicsUpdateDelay); //1 ms
+
+  //set intervals
+  //Ground
+  setInterval(
+    () => {
+      groundObjs.push(new Ground(game.screen.width));
+    },
+    Ground.width / Math.abs(velocityX),
+  );
+  //BackGround
+  setInterval(
+    () => {
+      backGroundObjs.push(new Background(game.screen.width));
+    },
+    (Background.width / Math.abs(backgroundVelocityX)) * 12,
+  );
+  //Pipes
+  setInterval(() => {
+    pipes.pushDoublePipe(
+      (gameScreenHeight - Ground.height) / 2 +
+        util.randInt(-pipeHeightRange, pipeHeightRange),
+    );
+  }, pipeFrequency);
+  //Bird
+  setInterval(birdPhysicsUpdate, physicsUpdateDelay); //1 ms
 };
+
+//-----Interval functions-------------------------------
+function birdPhysicsUpdate() {
+  //calculate y
+  bird.y = Math.min(
+    bird.velocityY + bird.y, // d y(t) = d v(t) * dt
+    game.screen.height - Ground.height - Bird.height,
+  );
+  bird.velocityY += Math.min(1, gravitationalAcc); // d v(t) = d a(t) * dt
+
+  //calculate collisions
+}
+
+//-----Rendering----------------------------------------
 
 //renders a frame
 function render() {
   requestAnimationFrame(render); //makes new frame
   context.clearRect(0, 0, game.screen.width, game.screen.height); //clear the previous frame, so that the frames do not stack onto echother
 
+  //Background
+  backGroundObjs.draw(
+    context,
+    (background) => background.x > -Background.width,
+    (background) => {
+      background.x += backgroundVelocityX;
+    },
+  );
+
   //bird
-  context.drawImage(bird.sprite, bird.x, bird.y, bird.width, bird.height);
+  bird.draw(context);
 
   //pipes
-  pipes.filter((pipe) => pipe.x > -pipe.width); //deletes hidden pipes
-  for (let pipe of pipes) {
-    pipe.x += velocityX;
-    pipe.draw(context);
-  }
+  pipes.draw(
+    context,
+    (pipe) => pipe.x > -PipeTop.width,
+    (pipe) => {
+      pipe.x += velocityX;
+    },
+  );
 
   //Ground
-  groundObjs.filter((ground) => ground.x > -ground.width);
-  for (let ground of groundObjs) {
-    ground.x += velocityX;
-    context.drawImage(
-      ground.sprite,
-      ground.x,
-      ground.y,
-      ground.width,
-      ground.height,
-    );
-  }
-}
-
-function placePipes() {
-  pipes.push(
-    new Pipe(
-      gameScreenHeight / 2 + util.randInt(-pipeHeightRange, pipeHeightRange),
-    ),
+  groundObjs.draw(
+    context,
+    (ground) => ground.x > -Ground.width,
+    (ground) => {
+      ground.x += velocityX;
+    },
   );
-}
-
-function placeGround() {
-  groundObjs.push(new Ground(groundWidth));
-}
-
-function birdPhisicsUpdate() {
-  //calculate y
-  bird.y += bird.velocityY; // d y(t) = d v(t) * dt
-  bird.velocityY += gravitationalAcc; // d v(t) = d a(t) * dt
-
-  //calculate collisions
 }
 
 //=======================================================
 // EVENT HANDLERS
 //=======================================================
+
+document.querySelector("body").addEventListener("click", () => {
+  if (bird.velocityY - 2 <= terminalVelocity) bird.velocityY -= 2;
+});
