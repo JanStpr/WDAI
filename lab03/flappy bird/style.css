@@ -1,0 +1,10 @@
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+#main-canvas {
+  background-image: url(./assets/Flappy\ Bird/background-day.png);
+  display: block; /*Normally, canvas is dispays as inline, adding some space below (like for a text)*/
+}
