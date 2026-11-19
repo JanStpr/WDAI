@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ćwiczenie 3</title>
+    <script src="script.js" defer></script>
+    <style>
+      body {
+        margin-top: 0px;
+      }
+      #main-flex {
+        display: flex;
+        flex-direction: column;
+      }
+      #nav-filter-bar {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        padding: 10px;
+      }
+
+      .product-entry {
+        background-color: rgb(194, 194, 194);
+
+        display: grid;
+        grid-template-areas: "l r";
+
+        margin: 10px;
+        border: solid;
+      }
+      .product-entry-left {
+        grid-area: l;
+        padding: 10px;
+      }
+      .product-entry-left h3 {
+        border-bottom: solid;
+      }
+      .product-entry-right {
+        grid-area: r;
+        margin: 10px;
+        border: dotted;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="nav-filter-bar">
+      <label for="order-by">Order by</label>
+      <select name="order-by" id="order-by">
+        <option value="original">Original</option>
+        <option value="ascending">Ascending</option>
+        <option value="descending">Descending</option>
+      </select>
+    </nav>
+    <main id="main-flex"></main>
+  </body>
+</html>

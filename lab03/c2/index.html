@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ćwiczenie 2</title>
+    <script src="script.js" defer></script>
+    <style>
+      * {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    Generator Haseł
+    <form id="password-generate-form">
+      <label for="min-len">Minimalna długość hasła</label>
+      <input type="number" name="min-len" id="min-len" required />
+      <br />
+      <label for="max-len">Maksymalna długość hasła</label>
+      <input type="number" name="max-len" id="max-len" required />
+      <br />
+      <label for="capital-letters">Czy hasło ma zawierać wielkie litery?</label>
+      <input type="checkbox" name="capital-letters" id="capital-letters" />
+      <br />
+      <label for="special-characters"
+        >Czy hasło ma zawierać znaki specjalne?</label
+      >
+      <input
+        type="checkbox"
+        name="special-characters"
+        id="special-characters"
+      />
+      <br />
+      <button type="submit" id="submitButton">Generuj</button>
+    </form>
+  </body>
+</html>

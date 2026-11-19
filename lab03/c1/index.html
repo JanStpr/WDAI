@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ćwiczenie 1</title>
+    <script src="script.js" defer></script>
+    <style>
+      * {
+        text-align: center;
+      }
+      #maingrid {
+        display: grid;
+        grid-template-areas: "clock . ." "start stop reset";
+        background-color: rgb(199, 199, 199);
+      }
+      #clock {
+        grid-area: "clock";
+        grid-column-start: 1;
+        grid-column-end: 4;
+
+        font-size: 50px;
+      }
+      .button {
+        font-size: 30px;
+      }
+      #button-start {
+        grid-area: "start";
+      }
+      #button-end {
+        grid-area: "stop";
+      }
+      #button-reset {
+        grid-area: "reset";
+      }
+    </style>
+  </head>
+  <body>
+    <main id="maingrid">
+      <div id="clock">0s</div>
+      <button id="button-start" class="button">start</button>
+      <button id="button-stop" class="button">stop</button>
+      <button id="button-reset" class="button">reset</button>
+    </main>
+  </body>
+</html>
