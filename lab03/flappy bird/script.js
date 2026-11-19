@@ -29,7 +29,6 @@ const jumpSetsVelocity = 2;
 //-----game object (screen)------------------------------
 const game = {
   screen: null, //has width and height attribute
-  pending: 1,
   score: 0,
 };
 let context; //not in the game object for the sake of having shorter code
@@ -51,6 +50,7 @@ class Single {
   }
 
   static loadImage(link) {
+    //There is no need to write .constructor, as this is a static method
     this.sprite = new Image();
     this.sprite.src = link;
   }
@@ -127,8 +127,25 @@ class SingleAnim extends Single {
     );
   }
 
+  static loadImage(key, link) {
+    let newSprite = new Image();
+    newSprite.src = link;
+
+    //initial sprite is the first loaded
+    if (this.keyFrames.size == 0) this.sprite = newSprite; //static sprite, whose value is taken by non static sprite on construction
+
+    this.keyFrames.set(key, newSprite);
+  }
+
   //new
-  sprite = this.constructor.sprite;
+  static keyFrames = new Map();
+  sprite = this.constructor.sprite; //current texture. By default it has the value of static sprite
+
+  changeKeyFrame(arg) {
+    if (this.constructor.keyFrames.has(arg))
+      this.sprite = this.constructor.keyFrames.get(arg);
+    else console.error(this + ": Unknown keyFrame type: " + arg);
+  }
 }
 
 //-----Bird--------------------------------------------
@@ -139,81 +156,30 @@ class Bird extends SingleAnim {
 
   //new
   velocityY = 0;
-
-  //keyframes
-  static flapsMiddle = null;
-  static flapsUp = null;
-  static flapsDown = null;
-
-  //params:
-  //  'up','down','mid'
-  changeKeyFrame(arg) {
-    switch (arg) {
-      case "up": {
-        this.sprite = this.constructor.flapsUp;
-        break;
-      }
-      case "down": {
-        this.sprite = this.constructor.flapsDown;
-        break;
-      }
-      case "mid": {
-        this.sprite = this.constructor.flapsMiddle;
-        break;
-      }
-    }
-  }
 }
 const bird = new Bird(gameScreenWidth / 8, gameScreenHeight / 2);
 
 //-----Pipes--------------------------------------------
 
-class PipeTop extends Single {
+class Pipe extends SingleAnim {
   //override
   static width = 52;
   static height = 320;
 
-  constructor(y, isFlipped) {
+  constructor(y, topOrBottom) {
     super(game.screen.width, y);
-    if (isFlipped != undefined) this.isFlipped = isFlipped;
-    else this.isFlipped = false;
-  }
 
-  draw(context) {
-    if (this.isFlipped) {
-      context.save(); //zapisujemy ustawienia kontekstu (do przywrócenia)
-      context.translate(
-        //zmienia punkt odniesienia
-        this.x + this.constructor.width / 2,
-        this.y + this.constructor.height / 2,
-      );
-      context.scale(1, -1); //odwracanie OX
-      context.drawImage(
-        this.constructor.sprite,
-        -this.constructor.width / 2,
-        -this.constructor.height / 2,
-        this.constructor.width,
-        this.constructor.height,
-      );
-      context.restore(); // Przywracamy normalny stan canvasu
-    } else
-      context.drawImage(
-        this.constructor.sprite,
-        this.x,
-        this.y - this.constructor.height,
-        this.constructor.width,
-        this.constructor.height,
-      );
+    this.changeKeyFrame(topOrBottom); //if uknown value, nothing happens, aside from message on console
+    if (!this.constructor.keyFrames.has(topOrBottom))
+      this.changeKeyFrame("top");
   }
-
   //new
-  isFlipped; // if true, then the pipe will be bottom
   passed = false; //true when bird passes the pipe. In double pipes, only the top one count the point.
 }
 
 class Pipes extends Singles {
   //override
-  static type = PipeTop;
+  static type = Pipe;
 }
 
 class DoublePipes extends Pipes {
@@ -227,10 +193,11 @@ class DoublePipes extends Pipes {
 
   pushDoublePipe(centerPoint) {
     //push top pipe
-    this.push(new PipeTop(centerPoint - this.halfGap, false));
+    let pipe = new Pipe(centerPoint - this.halfGap, "top");
+    this.push(new Pipe(centerPoint - this.halfGap - this.width / 2, "top"));
 
     //push bottom pipe
-    this.push(new PipeTop(centerPoint + this.halfGap, true));
+    this.push(new Pipe(centerPoint + this.halfGap, "bottom"));
   }
 }
 
@@ -285,16 +252,14 @@ window.onload = () => {
   context = game.screen.getContext("2d");
 
   //loading sprites
-  Bird.flapsMiddle = util.loadImage(
-    "./assets/Flappy\ Bird/yellowbird-midflap.png",
-  );
-  Bird.flapsUp = util.loadImage("./assets/Flappy\ Bird/yellowbird-upflap.png");
-  Bird.flapsDown = util.loadImage(
-    "./assets/Flappy\ Bird/yellowbird-downflap.png",
-  ); //not used
-  bird.sprite = Bird.flapsMiddle; //iniital bird keyframe
+  Bird.loadImage("mid", "./assets/Flappy\ Bird/yellowbird-midflap.png");
+  Bird.loadImage("up", "./assets/Flappy\ Bird/yellowbird-upflap.png");
+  Bird.loadImage("down", "./assets/Flappy\ Bird/yellowbird-downflap.png"); //not used
+  bird.changeKeyFrame("mid");
 
-  PipeTop.loadImage("./assets/Flappy\ Bird/pipe-green.png");
+  Pipe.loadImage("top", "./assets/Flappy\ Bird/pipe-green-top.png");
+  Pipe.loadImage("bottom", "./assets/Flappy\ Bird/pipe-green-bottom.png");
+
   Ground.loadImage("./assets/Flappy\ Bird/base.png");
   Background.loadImage("./assets/Flappy\ Bird/background-day.png");
 
@@ -367,12 +332,11 @@ function birdPhysicsUpdate() {
 function render() {
   //calculate collisions
   if (
-    bird.y == game.screen.height - Ground.height - Bird.height ||
-    bird.collidesWithColection(pipes)
-  )
-    game.pending = false;
-
-  if (game.pending == 1) {
+    !(
+      bird.y == game.screen.height - Ground.height - Bird.height ||
+      bird.collidesWithColection(pipes)
+    )
+  ) {
     requestAnimationFrame(render); //makes new frame
     context.clearRect(0, 0, game.screen.width, game.screen.height); //clear the previous frame, so that the frames do not stack onto echother
 
@@ -391,7 +355,7 @@ function render() {
     //pipes
     pipes.draw(
       context,
-      (pipe) => pipe.x > -PipeTop.width,
+      (pipe) => pipe.x > -Pipe.width,
       (pipe) => {
         pipe.x += velocityX;
       },
