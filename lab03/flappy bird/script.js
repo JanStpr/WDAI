@@ -34,10 +34,10 @@ let context; //not in the game object for the sake of having shorter code
 
 //-----Single-(generic class)--------------------------
 
-//A generic class for a world element, that appears on the screen only as a single (one sprite) object.
+//A generic class for a world element, that appears on the screen only as a single (one sprite) object, with a fixed sprite.
 class Single {
   //they are all static, as  they are shared by every
-  sprite = null; //needs to be loaded. This variable is the objects displayed sprite
+  static sprite = null; //needs to be loaded. This variable is the objects displayed sprite
   static width = gameScreenWidth;
   static height = gameScreenHeight;
   x;
@@ -54,7 +54,7 @@ class Single {
   }
 
   draw(context) {
-    //this.constructor. zapewnia, że odwołamy się do zmiennej statycznej klasy utworzonego obiektu
+    //this.constructor. make it, so that we acess static value, rather than local
     context.drawImage(
       this.constructor.sprite,
       this.x,
@@ -94,10 +94,28 @@ class Singles {
   }
 }
 
-//-----Bird--------------------------------------------
-class Bird extends Single {
+//A Single, but with multiple sprites for animation
+class SingleAnim extends Single {
+  //static sprite can be treated as default sprite. It can be accessed in this class as this.constructor.sprite (and as SingleAnim.sprite outside)
+
   //override
-  //sprite - current objects sprite
+  draw(context) {
+    context.drawImage(
+      this.sprite,
+      this.x,
+      this.y,
+      this.constructor.width,
+      this.constructor.height,
+    );
+  }
+
+  //new
+  sprite = this.constructor.sprite;
+}
+
+//-----Bird--------------------------------------------
+class Bird extends SingleAnim {
+  //override
   static width = 34;
   static height = 24;
 
@@ -114,15 +132,15 @@ class Bird extends Single {
   changeKeyFrame(arg) {
     switch (arg) {
       case "up": {
-        this.sprite = this.flapsUp;
+        this.sprite = this.constructor.flapsUp;
         break;
       }
       case "down": {
-        this.sprite = this.flapsDown;
+        this.sprite = this.constructor.flapsDown;
         break;
       }
       case "mid": {
-        this.sprite = this.flapsMiddle;
+        this.sprite = this.constructor.flapsMiddle;
         break;
       }
     }
@@ -255,7 +273,8 @@ window.onload = () => {
   Bird.flapsUp = util.loadImage("./assets/Flappy\ Bird/yellowbird-upflap.png");
   Bird.flapsDown = util.loadImage(
     "./assets/Flappy\ Bird/yellowbird-downflap.png",
-  );
+  ); //not used
+  bird.sprite = Bird.flapsMiddle; //iniital bird keyframe
 
   PipeTop.loadImage("./assets/Flappy\ Bird/pipe-green.png");
   Ground.loadImage("./assets/Flappy\ Bird/base.png");
@@ -316,8 +335,9 @@ function birdPhysicsUpdate() {
     bird.velocityY = -terminalVelocity;
 
   //annimating the bird, as it is dependent of physics
-  if (bird.velocityY > 0) bird.changeKeyFrame("up");
-  else if (bird.velocityY < 0) bird.changeKeyFrame("down");
+  if (bird.velocityY < 0) bird.changeKeyFrame("up");
+  else if (bird.velocityY > 0.2 && bird.velocityY > terminalVelocity / 2)
+    bird.changeKeyFrame("up");
   else bird.changeKeyFrame("mid");
 
   //calculate collisions
