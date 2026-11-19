@@ -15,4 +15,13 @@ body {
   display: block; /*Normally, canvas is dispays as inline, adding some space below (like for a text)*/
 
   background-color: skyblue;
+  position: relative;
+}
+
+#score {
+  position: absolute;
+  top: 10%;
+  font-size: 40px;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  color: white;
 }

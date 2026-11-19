@@ -10,7 +10,7 @@ const gameScreenHeight = 620;
 //-----Game rules--------------------------------------
 const pipeHeightRange = 50; //maximum offset that a pipe (it's holes center) would have from the center of screen
 const pipeFrequency = 1500; //
-const pipeGap = 120;
+const pipeGap = 140;
 
 //-----Physics-----------------------------------------
 const velocityX = -2;
@@ -29,6 +29,8 @@ const jumpSetsVelocity = 2;
 //-----game object (screen)------------------------------
 const game = {
   screen: null, //has width and height attribute
+  pending: 1,
+  score: 0,
 };
 let context; //not in the game object for the sake of having shorter code
 
@@ -62,6 +64,22 @@ class Single {
       this.constructor.width,
       this.constructor.height,
     );
+  }
+
+  collidesWith(single) {
+    return (
+      this.x < single.x + single.constructor.width &&
+      this.x + this.constructor.width > single.x &&
+      this.y < single.y + single.constructor.height &&
+      this.y + this.constructor.height > single.y
+    );
+  }
+
+  collidesWithColection(Singles) {
+    for (let single of Singles.list) {
+      if (this.collidesWith(single)) return true;
+    }
+    return false;
   }
 }
 
@@ -340,45 +358,54 @@ function birdPhysicsUpdate() {
     bird.changeKeyFrame("up");
   else bird.changeKeyFrame("mid");
 
-  //calculate collisions
+  //collisions in render, to sync the game state with the thing the user actually sees
 }
 
 //-----Rendering----------------------------------------
 
 //renders a frame
 function render() {
-  requestAnimationFrame(render); //makes new frame
-  context.clearRect(0, 0, game.screen.width, game.screen.height); //clear the previous frame, so that the frames do not stack onto echother
+  //calculate collisions
+  if (
+    bird.y == game.screen.height - Ground.height - Bird.height ||
+    bird.collidesWithColection(pipes)
+  )
+    game.pending = false;
 
-  //Background
-  backGroundObjs.draw(
-    context,
-    (background) => background.x > -Background.width,
-    (background) => {
-      background.x += backgroundVelocityX;
-    },
-  );
+  if (game.pending == 1) {
+    requestAnimationFrame(render); //makes new frame
+    context.clearRect(0, 0, game.screen.width, game.screen.height); //clear the previous frame, so that the frames do not stack onto echother
 
-  //bird
-  bird.draw(context);
+    //Background
+    backGroundObjs.draw(
+      context,
+      (background) => background.x > -Background.width,
+      (background) => {
+        background.x += backgroundVelocityX;
+      },
+    );
 
-  //pipes
-  pipes.draw(
-    context,
-    (pipe) => pipe.x > -PipeTop.width,
-    (pipe) => {
-      pipe.x += velocityX;
-    },
-  );
+    //bird
+    bird.draw(context);
 
-  //Ground
-  groundObjs.draw(
-    context,
-    (ground) => ground.x > -Ground.width,
-    (ground) => {
-      ground.x += velocityX;
-    },
-  );
+    //pipes
+    pipes.draw(
+      context,
+      (pipe) => pipe.x > -PipeTop.width,
+      (pipe) => {
+        pipe.x += velocityX;
+      },
+    );
+
+    //Ground
+    groundObjs.draw(
+      context,
+      (ground) => ground.x > -Ground.width,
+      (ground) => {
+        ground.x += velocityX;
+      },
+    );
+  }
 }
 
 //=======================================================
