@@ -18,8 +18,9 @@ const backgroundVelocityX = -0.7;
 
 const physicsUpdateDelay = 1; //in ms
 
-const gravitationalAcc = 0.01;
-const terminalVelocity = 1; //the velocity vecor can't get a value offsetted more thant this value from 0
+const gravitationalAcc = 0.03;
+const terminalVelocity = 4; //the velocity vecor can't get a value offsetted more thant this value from 0
+const jumpSetsVelocity = 2;
 
 //=======================================================
 // GLOBAL VARIABLES AND CONSTANTS
@@ -36,7 +37,7 @@ let context; //not in the game object for the sake of having shorter code
 //A generic class for a world element, that appears on the screen only as a single (one sprite) object.
 class Single {
   //they are all static, as  they are shared by every
-  static sprite = null;
+  sprite = null; //needs to be loaded. This variable is the objects displayed sprite
   static width = gameScreenWidth;
   static height = gameScreenHeight;
   x;
@@ -96,11 +97,36 @@ class Singles {
 //-----Bird--------------------------------------------
 class Bird extends Single {
   //override
+  //sprite - current objects sprite
   static width = 34;
   static height = 24;
 
   //new
   velocityY = 0;
+
+  //keyframes
+  static flapsMiddle = null;
+  static flapsUp = null;
+  static flapsDown = null;
+
+  //params:
+  //  'up','down','mid'
+  changeKeyFrame(arg) {
+    switch (arg) {
+      case "up": {
+        this.sprite = this.flapsUp;
+        break;
+      }
+      case "down": {
+        this.sprite = this.flapsDown;
+        break;
+      }
+      case "mid": {
+        this.sprite = this.flapsMiddle;
+        break;
+      }
+    }
+  }
 }
 const bird = new Bird(gameScreenWidth / 8, gameScreenHeight / 2);
 
@@ -223,7 +249,14 @@ window.onload = () => {
   context = game.screen.getContext("2d");
 
   //loading sprites
-  Bird.loadImage("./assets/Flappy\ Bird/yellowbird-midflap.png");
+  Bird.flapsMiddle = util.loadImage(
+    "./assets/Flappy\ Bird/yellowbird-midflap.png",
+  );
+  Bird.flapsUp = util.loadImage("./assets/Flappy\ Bird/yellowbird-upflap.png");
+  Bird.flapsDown = util.loadImage(
+    "./assets/Flappy\ Bird/yellowbird-downflap.png",
+  );
+
   PipeTop.loadImage("./assets/Flappy\ Bird/pipe-green.png");
   Ground.loadImage("./assets/Flappy\ Bird/base.png");
   Background.loadImage("./assets/Flappy\ Bird/background-day.png");
@@ -266,11 +299,26 @@ window.onload = () => {
 //-----Interval functions-------------------------------
 function birdPhysicsUpdate() {
   //calculate y
-  bird.y = Math.min(
-    bird.velocityY + bird.y, // d y(t) = d v(t) * dt
-    game.screen.height - Ground.height - Bird.height,
-  );
-  bird.velocityY += Math.min(1, gravitationalAcc); // d v(t) = d a(t) * dt
+  bird.y = bird.velocityY + bird.y; // d y(t) = d v(t) * dt
+  bird.velocityY += gravitationalAcc; // d v(t) = d a(t) * dt
+
+  //restrcting domains
+  if (bird.y < 0) {
+    bird.y = 0;
+    bird.velocityY = 0;
+  } else if (bird.y > game.screen.height - Ground.height - Bird.height) {
+    bird.y = game.screen.height - Ground.height - Bird.height;
+    bird.velocityY = 0;
+  }
+
+  if (bird.velocityY > terminalVelocity) bird.velocityY = terminalVelocity;
+  else if (bird.velocityY < -terminalVelocity)
+    bird.velocityY = -terminalVelocity;
+
+  //annimating the bird, as it is dependent of physics
+  if (bird.velocityY > 0) bird.changeKeyFrame("up");
+  else if (bird.velocityY < 0) bird.changeKeyFrame("down");
+  else bird.changeKeyFrame("mid");
 
   //calculate collisions
 }
@@ -318,5 +366,5 @@ function render() {
 //=======================================================
 
 document.querySelector("body").addEventListener("click", () => {
-  if (bird.velocityY - 2 <= terminalVelocity) bird.velocityY -= 2;
+  bird.velocityY = -jumpSetsVelocity;
 });
