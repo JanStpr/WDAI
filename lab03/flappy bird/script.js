@@ -3,9 +3,18 @@ import * as util from "./utils.js";
 //=======================================================
 // SETTINGS
 //=======================================================
+//-----Screen------------------------------------------
 const gameScreenWidth = 360;
 const gameScreenHeight = 620;
+
+//-----Game rules--------------------------------------
 const pipeHeightRange = 50; //maximum offset that a pipe (it's holes center) would have from the center of screen
+const pipeFrequency = 1500; //
+
+//-----Physics-----------------------------------------
+const physicsUpdateDelay = 1; //in ms
+const velocityX = -2;
+const gravitationalAcc = 0.02;
 
 //=======================================================
 // GLOBAL VARIABLES AND CONSTANTS
@@ -25,6 +34,7 @@ const bird = {
   height: 24,
   x: gameScreenWidth / 8,
   sprite: null,
+  velocityY: 0, //if velocity>0, than the bird falls
 
   //variable attributes
   y: gameScreenHeight / 2,
@@ -79,8 +89,23 @@ class Pipe {
   }
 }
 
-//-----Physics-----------------------------------------
-const velocityX = -2;
+//-----Ground-------------------------------------------
+let groundSprite = null;
+let groundObjs = [];
+
+const groundWidth = 336;
+
+class Ground {
+  sprite = groundSprite;
+  width = groundWidth;
+  height = 112;
+  x;
+  y = gameScreenHeight - 112;
+
+  constructor(x) {
+    this.x = x;
+  }
+}
 
 //=======================================================
 // FUNCTIONS
@@ -109,8 +134,16 @@ window.onload = () => {
   bottomPipeSprite = new Image();
   bottomPipeSprite.src = "./assets/Flappy\ Bird/pipe-green-bottom.png";
 
+  //load ground sprite
+  groundSprite = new Image();
+  groundSprite.src = "./assets/Flappy\ Bird/base.png";
+  groundObjs.push(new Ground(0));
+  groundObjs.push(new Ground(groundWidth));
+
   requestAnimationFrame(render); //renders a frame and after a calculated by processor (typically 60Hz) amount of time, runs the given function (render)
-  setInterval(placePipes, 1500); //1.5 seconds
+  setInterval(placeGround, groundWidth / Math.abs(velocityX));
+  setInterval(placePipes, pipeFrequency);
+  setInterval(birdPhisicsUpdate, physicsUpdateDelay); //1 ms
 };
 
 //renders a frame
@@ -122,9 +155,23 @@ function render() {
   context.drawImage(bird.sprite, bird.x, bird.y, bird.width, bird.height);
 
   //pipes
+  pipes.filter((pipe) => pipe.x > -pipe.width); //deletes hidden pipes
   for (let pipe of pipes) {
     pipe.x += velocityX;
     pipe.draw(context);
+  }
+
+  //Ground
+  groundObjs.filter((ground) => ground.x > -ground.width);
+  for (let ground of groundObjs) {
+    ground.x += velocityX;
+    context.drawImage(
+      ground.sprite,
+      ground.x,
+      ground.y,
+      ground.width,
+      ground.height,
+    );
   }
 }
 
@@ -134,6 +181,18 @@ function placePipes() {
       gameScreenHeight / 2 + util.randInt(-pipeHeightRange, pipeHeightRange),
     ),
   );
+}
+
+function placeGround() {
+  groundObjs.push(new Ground(groundWidth));
+}
+
+function birdPhisicsUpdate() {
+  //calculate y
+  bird.y += bird.velocityY; // d y(t) = d v(t) * dt
+  bird.velocityY += gravitationalAcc; // d v(t) = d a(t) * dt
+
+  //calculate collisions
 }
 
 //=======================================================
