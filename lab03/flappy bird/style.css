@@ -1,13 +1,21 @@
+html {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   margin: 0;
   display: flex;
   justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
 #main-canvas {
   display: block; /*Normally, canvas is dispays as inline, adding some space below (like for a text)*/
 
   background-image: url(./assets/Flappy\ Bird/background-day.png);
+  background-size: 100%;
 
   background-position: 0 0;
   animation: moveBackground 10s linear infinite;
