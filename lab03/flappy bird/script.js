@@ -30,6 +30,7 @@ const jumpSetsVelocity = 2;
 const game = {
   screen: null, //has width and height attribute
   score: 0,
+  pending: true,
 };
 let context; //not in the game object for the sake of having shorter code
 
@@ -193,8 +194,7 @@ class DoublePipes extends Pipes {
 
   pushDoublePipe(centerPoint) {
     //push top pipe
-    let pipe = new Pipe(centerPoint - this.halfGap, "top");
-    this.push(new Pipe(centerPoint - this.halfGap - this.width / 2, "top"));
+    this.push(new Pipe(centerPoint - this.halfGap - Pipe.height, "top"));
 
     //push bottom pipe
     this.push(new Pipe(centerPoint + this.halfGap, "bottom"));
@@ -330,13 +330,7 @@ function birdPhysicsUpdate() {
 
 //renders a frame
 function render() {
-  //calculate collisions
-  if (
-    !(
-      bird.y == game.screen.height - Ground.height - Bird.height ||
-      bird.collidesWithColection(pipes)
-    )
-  ) {
+  if (game.pending == true) {
     requestAnimationFrame(render); //makes new frame
     context.clearRect(0, 0, game.screen.width, game.screen.height); //clear the previous frame, so that the frames do not stack onto echother
 
@@ -369,6 +363,13 @@ function render() {
         ground.x += velocityX;
       },
     );
+
+    //calculate collisions - it is here in order to sync it with players view (because of it, the last frame is rendered)
+    if (
+      bird.y == game.screen.height - Ground.height - Bird.height ||
+      bird.collidesWithColection(pipes)
+    )
+      game.pending = false;
   }
 }
 
