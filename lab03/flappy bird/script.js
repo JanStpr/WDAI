@@ -30,9 +30,18 @@ const jumpSetsVelocity = 2;
 const game = {
   screen: null, //has width and height attribute
   score: 0,
-  pending: true,
+  loaded: false,
+  pending: false,
+  counter: 0,
 };
 let context; //not in the game object for the sake of having shorter code
+
+let animationFrame;
+
+let groundInterval;
+let backgroundInterval;
+let pipesInterval;
+let birdInterval;
 
 //-----Single-(generic class)--------------------------
 
@@ -263,41 +272,61 @@ window.onload = () => {
   Ground.loadImage("./assets/Flappy\ Bird/base.png");
   Background.loadImage("./assets/Flappy\ Bird/background-day.png");
 
-  //pushing initial elements
+  init();
+  animationFrame = requestAnimationFrame(render);
+  game.loaded = true;
+};
+
+function init() {
+  cleanState();
+  game.counter += 1;
+
+  //push initial objects
   groundObjs.push(new Ground(0));
   groundObjs.push(new Ground(Ground.width));
   backGroundObjs.push(new Background(0));
   backGroundObjs.push(new Background(Background.width));
 
-  //start rendering
-  requestAnimationFrame(render); //renders a frame and after a calculated by processor (typically 60Hz) amount of time, runs the given function (render)
-  updateScore();
+  //bird initial pos
+  bird.y = gameScreenWidth / 2;
 
-  //set intervals
-  //Ground
-  setInterval(
+  groundInterval = setInterval(
     () => {
       groundObjs.push(new Ground(gameScreenWidth));
     },
     Ground.width / Math.abs(velocityX),
   );
-  //BackGround
-  setInterval(
+  backgroundInterval = setInterval(
     () => {
       backGroundObjs.push(new Background(gameScreenWidth));
     },
     (Background.width / Math.abs(backgroundVelocityX)) * 12,
   );
-  //Pipes
-  setInterval(() => {
+}
+
+function startTime() {
+  //set gameplay intervals
+  game.score = 0;
+  updateScore();
+  pipesInterval = setInterval(() => {
     pipes.pushDoublePipe(
       (gameScreenHeight - Ground.height) / 2 +
         util.randInt(-pipeHeightRange, pipeHeightRange),
     );
   }, pipeFrequency);
-  //Bird
-  setInterval(birdPhysicsUpdate, physicsUpdateDelay); //1 ms
-};
+
+  birdInterval = setInterval(birdPhysicsUpdate, physicsUpdateDelay); //1 ms
+}
+
+function cleanState() {
+  clearInterval(groundInterval);
+  clearInterval(backgroundInterval);
+  clearInterval(pipesInterval);
+  clearInterval(birdInterval);
+  while (pipes.list.length > 0) pipes.list.pop();
+  while (groundObjs.list.length > 0) groundObjs.list.pop();
+  while (backGroundObjs.list.length > 0) backGroundObjs.list.pop();
+}
 
 //-----Interval functions-------------------------------
 function birdPhysicsUpdate() {
@@ -331,51 +360,42 @@ function birdPhysicsUpdate() {
 
 //renders a frame
 function render() {
-  if (game.pending == true) {
-    requestAnimationFrame(render); //makes new frame
-    context.clearRect(0, 0, gameScreenWidth, gameScreenHeight); //clear the previous frame, so that the frames do not stack onto echother
+  animationFrame = requestAnimationFrame(render); //makes new frame
+  context.clearRect(0, 0, gameScreenWidth, gameScreenHeight); //clear the previous frame, so that the frames do not stack onto echother
 
-    //Background
-    backGroundObjs.draw(
-      context,
-      (background) => background.x > -Background.width,
-      (background) => {
-        background.x += backgroundVelocityX;
-      },
-    );
+  //Background
+  backGroundObjs.draw(
+    context,
+    (background) => background.x > -Background.width,
+    (background) => {
+      background.x += backgroundVelocityX;
+    },
+  );
 
-    //bird
-    bird.draw(context);
+  //bird
+  bird.draw(context);
 
-    //pipes
-    pipes.draw(
-      context,
-      (pipe) => pipe.x > -Pipe.width,
-      (pipe) => {
-        pipe.x += velocityX;
-      },
-    );
+  //pipes
+  pipes.draw(
+    context,
+    (pipe) => pipe.x > -Pipe.width,
+    (pipe) => {
+      pipe.x += velocityX;
+    },
+  );
 
-    //Ground
-    groundObjs.draw(
-      context,
-      (ground) => ground.x > -Ground.width,
-      (ground) => {
-        ground.x += velocityX;
-      },
-    );
-    afterEachFrame();
-  }
+  //Ground
+  groundObjs.draw(
+    context,
+    (ground) => ground.x > -Ground.width,
+    (ground) => {
+      ground.x += velocityX;
+    },
+  );
+  afterEachFrame();
 }
 
 function afterEachFrame() {
-  //calculate collisions - it is here in order to sync it with players view (because of it, the last frame is rendered)
-  if (
-    bird.y == gameScreenHeight - Ground.height - Bird.height ||
-    bird.collidesWithColection(pipes)
-  )
-    game.pending = false;
-
   for (let pipe of pipes.list) {
     if (
       pipe.sprite == Pipe.keyFrames.get("top") && //made in order to all doublepipes be counted once
@@ -387,6 +407,18 @@ function afterEachFrame() {
       updateScore();
     }
   }
+
+  //calculate collisions - it is here in order to sync it with players view (because of it, the last frame is rendered)
+  if (
+    bird.y == gameScreenHeight - Ground.height - Bird.height ||
+    bird.collidesWithColection(pipes)
+  ) {
+    cancelAnimationFrame(animationFrame);
+    game.loaded = false;
+    init();
+    game.loaded = true;
+    game.pending = false;
+  }
 }
 
 //=======================================================
@@ -394,7 +426,14 @@ function afterEachFrame() {
 //=======================================================
 
 document.querySelector("body").addEventListener("click", () => {
-  bird.velocityY = -jumpSetsVelocity;
+  if (game.loaded) {
+    if (!game.pending) {
+      if (game.counter > 1) animationFrame = requestAnimationFrame(render);
+      startTime();
+      game.pending = true;
+    }
+    bird.velocityY = -jumpSetsVelocity;
+  }
 });
 
 //=======================================================
