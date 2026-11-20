@@ -271,6 +271,7 @@ window.onload = () => {
 
   //start rendering
   requestAnimationFrame(render); //renders a frame and after a calculated by processor (typically 60Hz) amount of time, runs the given function (render)
+  updateScore();
 
   //set intervals
   //Ground
@@ -363,13 +364,28 @@ function render() {
         ground.x += velocityX;
       },
     );
+    afterEachFrame();
+  }
+}
 
-    //calculate collisions - it is here in order to sync it with players view (because of it, the last frame is rendered)
+function afterEachFrame() {
+  //calculate collisions - it is here in order to sync it with players view (because of it, the last frame is rendered)
+  if (
+    bird.y == game.screen.height - Ground.height - Bird.height ||
+    bird.collidesWithColection(pipes)
+  )
+    game.pending = false;
+
+  for (let pipe of pipes.list) {
     if (
-      bird.y == game.screen.height - Ground.height - Bird.height ||
-      bird.collidesWithColection(pipes)
-    )
-      game.pending = false;
+      pipe.sprite == Pipe.keyFrames.get("top") && //made in order to all doublepipes be counted once
+      bird.x > pipe.x && //pipe already passed
+      pipe.passed == false //pipe not passed before
+    ) {
+      pipe.passed = true;
+      game.score += 1;
+      updateScore();
+    }
   }
 }
 
@@ -380,3 +396,13 @@ function render() {
 document.querySelector("body").addEventListener("click", () => {
   bird.velocityY = -jumpSetsVelocity;
 });
+
+//=======================================================
+// Interactions with html structure
+//=======================================================
+let htmlScore = document.getElementById("score");
+
+//could be modified to display font from assets images
+function updateScore() {
+  htmlScore.innerText = game.score;
+}
