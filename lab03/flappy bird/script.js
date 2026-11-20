@@ -168,7 +168,7 @@ class Pipe extends SingleAnim {
   static height = 320;
 
   constructor(y, topOrBottom) {
-    super(game.screen.width, y);
+    super(gameScreenWidth, y);
 
     this.changeKeyFrame(topOrBottom); //if uknown value, nothing happens, aside from message on console
     if (!this.constructor.keyFrames.has(topOrBottom))
@@ -277,14 +277,14 @@ window.onload = () => {
   //Ground
   setInterval(
     () => {
-      groundObjs.push(new Ground(game.screen.width));
+      groundObjs.push(new Ground(gameScreenWidth));
     },
     Ground.width / Math.abs(velocityX),
   );
   //BackGround
   setInterval(
     () => {
-      backGroundObjs.push(new Background(game.screen.width));
+      backGroundObjs.push(new Background(gameScreenWidth));
     },
     (Background.width / Math.abs(backgroundVelocityX)) * 12,
   );
@@ -309,8 +309,8 @@ function birdPhysicsUpdate() {
   if (bird.y < 0) {
     bird.y = 0;
     bird.velocityY = 0;
-  } else if (bird.y > game.screen.height - Ground.height - Bird.height) {
-    bird.y = game.screen.height - Ground.height - Bird.height;
+  } else if (bird.y > gameScreenHeight - Ground.height - Bird.height) {
+    bird.y = gameScreenHeight - Ground.height - Bird.height;
     bird.velocityY = 0;
   }
 
@@ -333,7 +333,7 @@ function birdPhysicsUpdate() {
 function render() {
   if (game.pending == true) {
     requestAnimationFrame(render); //makes new frame
-    context.clearRect(0, 0, game.screen.width, game.screen.height); //clear the previous frame, so that the frames do not stack onto echother
+    context.clearRect(0, 0, gameScreenWidth, gameScreenHeight); //clear the previous frame, so that the frames do not stack onto echother
 
     //Background
     backGroundObjs.draw(
@@ -371,7 +371,7 @@ function render() {
 function afterEachFrame() {
   //calculate collisions - it is here in order to sync it with players view (because of it, the last frame is rendered)
   if (
-    bird.y == game.screen.height - Ground.height - Bird.height ||
+    bird.y == gameScreenHeight - Ground.height - Bird.height ||
     bird.collidesWithColection(pipes)
   )
     game.pending = false;
